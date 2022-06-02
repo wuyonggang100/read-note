@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="1px"
+        height="31px"
+      >
+        <defs>
+          <filter id="Filter_0">
+            <feFlood
+              flood-color="rgb(200, 200, 200)"
+              flood-opacity="1"
+              result="floodOut"
+            />
+            <feComposite
+              operator="atop"
+              in="floodOut"
+              in2="SourceGraphic"
+              result="compOut"
+            />
+            <feBlend mode="normal" in="compOut" in2="SourceGraphic" />
+          </filter>
+        </defs>
+        <g filter="url(#Filter_0)">
+          <path
+            fill-rule="evenodd"
+            fill="rgb(0, 0, 0)"
+            d="M1.000,-0.000 L0.000,-0.000 L0.000,31.000 L1.000,31.000 L1.000,-0.000 Z"
+          />
+        </g>
+      </svg>
+    </div>
+    <script>
+      var Iterator = function (obj) {
+        var current = 0;
+        var next = function () {
+          current += 1;
+        };
+        var isDone = function () {
+          return current >= obj.length;
+        };
+        var getCurrItem = function () {
+          return obj[current];
+        };
+        return {
+          next: next,
+          isDone: isDone,
+          getCurrItem: getCurrItem,
+        };
+      };
+      // 再看看如何改写compare 函数：
+      var compare = function (iterator1, iterator2) {
+        while (!iterator1.isDone() && !iterator2.isDone()) {
+          if (iterator1.getCurrItem() !== iterator2.getCurrItem()) {
+            throw new Error("iterator1 和iterator2 不相等");
+          }
+          iterator1.next();
+          iterator2.next();
+        }
+        alert("iterator1 和iterator2 相等");
+      };
+      var iterator1 = Iterator([1, 2, 3]);
+      var iterator2 = Iterator([1, 2, 3]);
+      compare(iterator1, iterator2); // 输出：iterator1 和iterator2 相等
+
+      // -----------compressStr---------------------------
+      function compressStr(str) {
+        if (str.length === 0) return "";
+        let pre = "";
+        let num = 0;
+        let target = "";
+        for (let i = 0; i < str.length; i++) {
+          if (str[i] === pre) {
+            num++;
+            target = target.slice(0, -1) + `${num}`;
+          } else {
+            pre = str[i];
+            num = 1;
+            target += `${pre}${num}`;
+          }
+        }
+        return target.length < str.length ? target : str;
+      }
+    </script>
+  </body>
+</html>

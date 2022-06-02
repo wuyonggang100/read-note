@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <!-- <script src="./01.单例模式.js"></script> -->
+
+
+  <form id="form">
+    <label for="">name</label>
+    <input type="text" name="username" />
+    <label for="">age</label>
+    <input type="text" name="age" />
+  </form>
+
+  <button onclick="getData()">按钮</button>
+
+  <script>
+    // var form = document.getElementById('form');
+    // function getData() {
+    //   var data = {
+    //     name: form.username.value,
+    //     age: form.age.value
+    //   }
+    //   console.log('----', data)
+    // }
+
+
+
+
+
+
+
+    // 策略算法定义
+    var strategies = {
+      isNonEmpty: function (value, errorMsg) { // 不为空
+        if (value === '') {
+          return errorMsg;
+        }
+      },
+      minLength: function (value, length, errorMsg) { // 限制最小长度
+        if (value.length < length) {
+          return errorMsg;
+        }
+      },
+      isMobile: function (value, errorMsg) { // 手机号码格式
+        if (!/(^1[3|5|8][0-9]{9}$)/.test(value)) {
+          return errorMsg;
+        }
+      }
+    };
+
+    // Validator 类的实现：
+    var Validator = function () {
+      this.cache = []; // 保存全部校验规则
+    };
+    Validator.prototype.add = function (dom, rule, errorMsg) {
+      var args = rule.split(':'); // 把strategy 和参数分开, args 最后是 策略执行时的参数
+      this.cache.push(function () { // 把校验的步骤用空函数包装起来，并且放入cache
+        var strategy = args.shift(); // 用户挑选的strategy
+        args.unshift(dom.value); // 把input 的value 添加进参数列表头部
+        args.push(errorMsg); // 把errorMsg 添加进参数列表
+        return strategies[strategy].apply(dom, args);
+      });
+    };
+    Validator.prototype.start = function () {
+      for (var i = 0, validatorFunc; validatorFunc = this.cache[i++];) {
+        var msg = validatorFunc(); // 开始校验，并取得校验后的返回信息
+        if (msg) { // 如果有确切的返回值，说明校验没有通过
+          return msg;
+        }
+      }
+    };
+
+
+    var validataFunc = function () {
+      var validator = new Validator(); // 创建一个validator 对象
+      /***************添加一些校验规则****************/
+      validator.add(registerForm.userName, 'isNonEmpty', '用户名不能为空');
+      validator.add(registerForm.password, 'minLength:6', '密码长度不能少于6 位');
+      validator.add(registerForm.phoneNumber, 'isMobile', '手机号码格式不正确');
+      var errorMsg = validator.start(); // 获得校验结果
+      return errorMsg; // 返回校验结果
+    }
+
+    var registerForm = document.getElementById('registerForm');
+    registerForm.onsubmit = function () {
+      var errorMsg = validataFunc(); // 如果errorMsg 有确切的返回值，说明未通过校验
+      if (errorMsg) {
+        alert(errorMsg);
+        return false; // 阻止表单提交
+      }
+    };
+
+
+  /* 每个缓动算法的参数：
+    动画已消耗的时间、
+    小球原始位置、
+    小球目标位置、
+    动画持续的总时间，
+    返回的值则是动画元素应该处在的当前位置
+  */
+    var tween = {
+      linear: function (t, b, c, d) {
+        return c * t / d + b;
+      },
+      easeIn: function (t, b, c, d) {
+        return c * (t /= d) * t + b;
+      },
+      strongEaseIn: function (t, b, c, d) {
+        return c * (t /= d) * t * t * t * t + b;
+      },
+      strongEaseOut: function (t, b, c, d) {
+        return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+      },
+      sineaseIn: function (t, b, c, d) {
+        return c * (t /= d) * t * t + b;
+      },
+      sineaseOut: function (t, b, c, d) {
+        return c * ((t = t / d - 1) * t * t + 1) + b;
+      }
+    };
+
+
+    var Animate = function (dom) {
+      this.dom = dom; // 进行运动的dom 节点
+      this.startTime = 0; // 动画开始时间
+      this.startPos = 0; // 动画开始时，dom 节点的位置，即dom 的初始位置
+      this.endPos = 0; // 动画结束时，dom 节点的位置，即dom 的目标位置
+      this.propertyName = null; // dom 节点需要被改变的css 属性名
+      this.easing = null; // 缓动算法
+      this.duration = null; // 动画持续时间
+    };
+
+
+    /*
+    propertyName：要改变的CSS 属性名，比如'left'、'top'，分别表示左右移动和上下移动。
+    endPos： 小球运动的目标位置。
+    duration： 动画持续时间。
+    easing： 缓动算法。
+    */
+    Animate.prototype.start = function (propertyName, endPos, duration, easing) {
+      this.startTime = +new Date; // 动画启动时间
+      this.startPos = this.dom.getBoundingClientRect()[propertyName]; // dom 节点初始位置
+      this.propertyName = propertyName; // dom 节点需要被改变的CSS 属性名
+      this.endPos = endPos; // dom 节点目标位置
+      this.duration = duration; // 动画持续事件
+      this.easing = tween[easing]; // 缓动算法
+      var self = this;
+      var timeId = setInterval(function () { // 启动定时器，开始执行动画
+        if (self.step() === false) { // 如果动画已结束，则清除定时器
+          clearInterval(timeId);
+        }
+      }, 19);
+    };
+    Animate.prototype.step = function () {
+      var t = +new Date; // 取得当前时间
+      if (t >= this.startTime + this.duration) { // (1)
+        this.update(this.endPos); // 更新小球的CSS 属性值
+        return false;
+      }
+      var pos = this.easing(t - this.startTime, this.startPos,
+        this.endPos - this.startPos, this.duration);
+      // pos 为小球当前位置
+      this.update(pos); // 更新小球的CSS 属性值
+    };
+
+    Animate.prototype.update = function (pos) {
+      this.dom.style[this.propertyName] = pos + 'px';
+    };
+
+
+    // ------------- 让小球动起来--------------------------
+    var div = document.getElementById('div');
+    var animate = new Animate(div);
+    animate.start('left', 500, 1000, 'strongEaseOut');
+// animate.start( 'top', 1500, 500, 'strongEaseIn' );
+
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>
