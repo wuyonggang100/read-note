@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "fs-extra": "^10.1.0",
+    "md5": "^2.3.0"
+  }
+}
