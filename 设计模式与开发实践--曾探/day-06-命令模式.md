@@ -120,3 +120,160 @@ var refreshMenuBarCommand = RefreshMenuBarCommand(MenuBar);
 setCommand(button1, refreshMenuBarCommand);
 ```
 
+命令模式实现撤销功能
+
+> 这只能撤销一次命令，如果是一串命令，就不适用了；
+
+```js
+var ball = document.getElementById("ball");
+var pos = document.getElementById("pos");
+var moveBtn = document.getElementById("moveBtn");
+var cancelBtn = document.getElementById("cancelBtn");
+
+class MoveCommand {
+    constructor(receiver, pos) {
+        this.receiver = receiver;
+        this.pos = pos;
+        this.oldPos = null;
+    }
+    execute() {
+        this.receiver.start("left", this.pos, 1000, "strongEaseOut");
+        this.oldPos =
+            this.receiver.dom.getBoundingClientRect()[
+            this.receiver.propertyName
+        ];
+        // 记录小球开始移动前的位置
+    }
+    undo() {
+        this.receiver.start("left", this.oldPos, 1000, "strongEaseOut");
+        // 回到小球移动前记录的位置
+    }
+}
+moveBtn.onclick = function () {
+    var animate = new Animate(ball);
+    moveCommand = new MoveCommand(animate, pos.value);
+    moveCommand.execute();
+};
+cancelBtn.onclick = function () {
+    moveCommand.undo(); // 撤销命令
+};
+```
+
+命令模式实现系列撤销
+
+> 需要有一个栈来存历史记录，如果有重做功能，还需要有个指针前进或后退，来取出命令执行；
+
+```js
+// 操作列表
+var Ryu = {
+    attack: function () {
+        console.log("攻击");
+    },
+    defense: function () {
+        console.log("防御");
+    },
+    jump: function () {
+        console.log("跳跃");
+    },
+    crouch: function () {
+        console.log("蹲下");
+    },
+};
+var makeCommand = function (receiver, state) {
+    // 创建命令
+    return function () {
+        receiver[state]();
+    };
+};
+var commands = {
+    119: "jump", // W
+    115: "crouch", // S
+    97: "defense", // A
+    100: "attack", // D
+};
+var commandStack = []; // 保存命令的堆栈
+document.onkeypress = function (ev) {
+    var keyCode = ev.keyCode,
+        command = makeCommand(Ryu, commands[keyCode]);
+    if (command) {
+        command(); // 执行命令
+        commandStack.push(command); // 将刚刚执行过的命令保存进堆栈
+    }
+};
+
+document.getElementById("replay").onclick = function () {
+    // 点击播放录像
+    var command;
+    var point = 0; // 指针
+    while ((command = commandStack[point])) {
+        // 从堆栈里依次取出命令并执行
+        command();
+        point++
+    }
+};
+```
+
+命令队列
+
+> 将命令进行排队，前一个执行完毕后，再执行下一个；命令执行完毕可以用回调函数或者发布订阅的方式来通知，订阅者接收到消息后，就开始执行队列里的下一个命令；
+
+宏命令
+
+> 宏命令是一组命令的集合，通过执行宏命令的方式，可以一次执行一批命令。可以用一个主命令来执行其他子命令；
+>
+> 宏命令是命令模式与组合模式的联用产物。
+
+```js
+// 预先定义好子命令
+var closeDoorCommand = {
+    execute: function () {
+        console.log("关门");
+    },
+};
+var openPcCommand = {
+    execute: function () {
+        console.log("开电脑");
+    },
+};
+var openQQCommand = {
+    execute: function () {
+        console.log("登录QQ");
+    },
+};
+var MacroCommand = function () {
+    return {
+        commandsList: [],
+        add: function (command) {
+            this.commandsList.push(command);
+        },
+        execute: function () {
+            for (var i = 0, command; (command = this.commandsList[i++]); ) {
+                command.execute();
+            }
+        },
+    };
+};
+var macroCommand = MacroCommand();
+macroCommand.add(closeDoorCommand);
+macroCommand.add(openPcCommand);
+macroCommand.add(openQQCommand);
+macroCommand.execute();
+```
+
+智能命令与傻瓜命令
+
+> 一般来说，命令模式都会在command 对象中保存一个接收者来负责真正执行客户的请求，这种情况下命令对象是“傻瓜式”的，它只负责把客户的请求转交给接收者来执行，这种模式的好处是请求发起者和请求接收者之间尽可能地得到了解耦。
+>
+> 也可以定义一些更“聪明”的命令对象，“聪明”的命令对象可以直接实现请求，这样一来就不再需要接收者的存在，这种“聪明”的命令对象也叫作智能命令。。没有接收者的智能命令，退化到和策略模式非常相近，从代码结构上已经无法分辨它们，能分辨的只有它们意图的不同。策略模式指向的问题域更小，所有策略对象的目标总是一致的，它们只是达到这个目标的不同手段，它们的内部实现是针对“算法”而言的。而智能命令模式指向的问题域更广，command 对象解决的目标更具发散性。命令模式还可以完成撤销、排队等功能。
+
+```js
+var closeDoorCommand = {
+	execute: function(){
+		console.log( '关门' );
+	}
+};
+```
+
+
+
+JavaScript 可以用高阶函数非常方便地实现命令模式。命令模式在JavaScript 语言中是一种隐形的模式。命令可以用函数的方式存储起来。
