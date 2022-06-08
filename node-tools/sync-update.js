@@ -26,13 +26,39 @@ const copyDir = function (srcDir, distDir) {
   });
 };
 
-const copyFile = function (src, dist) {
-  console.log("copy file to" + dist);
-  fse.copy(src, dist, (err) => {
-    if (err) return console.error(err);
-    console.log(`copy ${src} success!`);
+// const copyFile = function (src, dist) {
+//   console.log("copy file to" + dist);
+//   fse.copy(src, dist, (err) => {
+//     if (err) return console.error(err);
+//     console.log(`copy ${src} success!`);
+//   });
+// };
+function copyFile(srcPath, tarPath, cb) {
+  var rs = fs.createReadStream(srcPath);
+  rs.on("error", function (err) {
+    if (err) {
+      console.log("read error", srcPath);
+    }
+    cb && cb(err);
   });
-};
+
+  var ws = fs.createWriteStream(tarPath);
+  ws.on("error", function (err) {
+    if (err) {
+      console.log("write error", tarPath);
+    }
+    cb && cb(err);
+  });
+
+  ws.on("close", function (ex) {
+    cb && cb(ex);
+    // console.log("写入流关闭--");
+    rs.close();
+  });
+
+  rs.pipe(ws);
+  console.log("复制文件完成", srcPath);
+}
 
 const srcDir = _path.resolve(__dirname, "./src");
 const distDir = _path.resolve(__dirname, "./target");
