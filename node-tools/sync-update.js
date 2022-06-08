@@ -134,13 +134,14 @@ function syncUpdate(srcDir, distDir) {
       log("File", path, "has been removed");
       const relativePath = getRelativePath(srcDir, path);
       const targetPath = _path.join(distDir, relativePath);
+      log("File", targetPath, "should be remove");
       removeFile(targetPath);
     })
     .on("unlinkDir", function (path) {
       log("Directory", path, "has been removed");
       const relativePath = getRelativePath(srcDir, path);
       const targetDir = _path.join(distDir, relativePath);
-      log("Directory", targetDir, "should been removed");
+      log("Directory", targetDir, "should be remove");
       removeDir(targetDir);
     })
     .on("error", function (error) {
