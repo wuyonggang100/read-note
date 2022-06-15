@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- <link rel="icon" href="favicon.ico" type="image/x-icon"> -->
+    <link rel="icon" 
+    href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAAAXNSR0IArs4c6QAAA2NJREFUaEPtmV+ITHEUxz/nrpFirD8pCiF5pJSi/NsHPCBv95r1wsywJZJSypMXUZ6IzbZ775YsM1frBckDkfLgBVGUf4mSEsl/Zubo7raYnb0zs3Pv7J8xv8d7zzn39z3fc+45v/MTamRJjeCgDmSkMVln5P9ixHVWge5HWQwydlDgRZ+BnmHa65M0HcyU0q1eaKU6WhBpBYxSmyjx/jIS3YRpZovJVQdItzOPjD4CBseC705lD1b8+NADSdsHgEMBmfirLtzFTCweeiApuxNha2hAkA9Y8SnBgHS3zSAT2Qm6AmE8OR6ihkNs2y1fwymnC9Fmn/cKXEAkBdkX0NCI5taB7AAm+eh8xEr4vetRKZ4jbvsa1DgPNBZ8QOUY1ra9iHgby1/+QL4iamImLxfodLfPJGNcAhYNACYAELd9LmrcAyb6U6oHsJKHyweiCayk42vvnDMLQx8M4LgAQNLOKdCWEnH+DonOxjS/5ckNxIjyHCs+f0AG/1VOO0dB9/X7bgAgKfsZwrwyEvYXEMmTE92CmTxbhm6hSMpei3A1PCBp+x0wtaLNBALSuQTJ3QkTiGdsSRlATqN8z5MzeAHyPu+Z5t5gJS+WtJd2YqD92QwUWrsRilZT4AFWYmGZyf6FbGYOzS0e0/7LtS+ibAiPEdcdi36+CbrU56s/yUkTsfjtMoGAahorEfNNeNexUE2F+/v1rHW1TqZh3AlEY3k1R3mCGgnfolisIIpcIJPdSfP2t3823NYWYVJkF+gRn/4sQGj965ZznXNoyK4AYwLZ7CMaGm8V7UaLV3bP8nfQ6ygvEfEqdhMwvUjAhQSkZIb2EygNZLAW60AG67F8+Tojvv4LKbS8ZDd0OUI0pGT/AXoNjFegXme9urrJ7rY1kou0ju7fb09B/HQDWBZaQQQXM755aAtiyh6eFiVte4er9eG1KGl7eJpGt6MZla4wgdRIG187B6uQj7rwFDO+YOiPur3Dh/tA1L/Mj4bhg7f73vOzNw4qnKSMmnFQHw1/B3QrEcag8gThNGb8ui9TI25AV2nrOCJHppWAqZkhdu+1wuOCeVclTunRGa5rhZ4fRUgXPcIViG4cnouePs/XxNVbxWFUmWJ1rt4q20sgrTqQQO6rgnKdkSo4NZDJOiOB3FcF5d81+8ZCJHgwMwAAAABJRU5ErkJggg==" type="image/x-icon">
+    <title>Title</title>
+    <style>
+      .is-error + p {
+        color: red;
+      }
+
+      @media screen and (orientation: landscape) {
+        .content {
+          max-width: 80%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- <div class="parent" style="background: darkred"> -->
+      <!-- <div class="content" style="margin:0 auto; background:#f8b9b7">
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+        <p>我是内容区</p>
+    </div> -->
+         <form id="registerForm">
+             <label>姓名</label>
+             <input type="text" name="username"/>
+
+             <label>电话</label>
+             <input type="text" name="phone" onchange="validataFunc()"/>
+             <label>年龄</label>
+             <input type="text" name="age" onchange="validataFunc()"/>
+             <!-- <p></p> -->
+         </form>
+         <button onclick="submit()">提交</button>
+    </div>
+
+    <script src="./form-validator.js"></script>
+  </body>
+</html>
