@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <style type="text/css">
+      table,
+      tr,
+      td {
+        border: 1px solid;
+        border-collapse: collapse;
+      }
+      table {
+        width: 1000px;
+        min-width: 100%;
+        table-layout: fixed;
+      }
+      tr,
+      td {
+        height: 30px;
+      }
+      table > tbody > th > td {
+        width: 40px;
+      }
+      /*设定td的宽度,无效*/
+      /*#col1{
+width: 40px;
+}
+#col2{
+width: 80px;
+}
+#col4{
+width: 50px;
+}
+#col7{
+width: 120px;
+}*/
+    </style>
+  </head>
+  <body>
+    <table>
+      <!--所有的宽度设定时，已设定宽度不能被4整除时会出现不能设定宽度，与列数多少无关-->
+      <!--全部用colgroup-->
+      <!--<colgroup align="center" width="100">
+</colgroup>
+<colgroup  />
+<colgroup  />
+<colgroup  />
+<colgroup />
+<colgroup />
+<colgroup style="width:90px;"/>
+<colgroup />-->
+      <!--全部用col-->
+      <!--<col width="90" />
+<col  />
+<col width="90" />-->
+      <!--<col  />
+<col width="80"/>
+<col  />
+<col  />
+<col  />-->
+      <!--colspan 和 col融合-->
+      <!-- colgroup  标签不指定宽度的会被剩余宽度平均分配 -->
+
+      <colgroup span="3" width="99">
+        <!--组合用时同样受4的倍数限定， 以实际 col 宽度和为准-->
+        <col width="97" />
+        <col width="90" />
+        <col width="120" />
+      </colgroup>
+      <colgroup span="1"></colgroup>
+      <colgroup width="80"></colgroup>
+      <!--span缺省值为1-->
+      <colgroup width="95"></colgroup>
+      <colgroup></colgroup>
+      <tr>
+        <td id="col1">diyi</td>
+        <td id="col1">diyi</td>
+        <td id="col2">第二列</td>
+        <td id="col3">第三列</td>
+        <td id="col4">第四列</td>
+        <td id="col5">第五列</td>
+        <td id="col6">第六列</td>
+        <td id="col7">第七列</td>
+      </tr>
+      <tr>
+        <td>adfa</td>
+        <td>飒飒东风</td>
+        <td>谔谔</td>
+        <td>打发</td>
+        <td>打法微软</td>
+        <td>啊多发点</td>
+        <td>啊啊啊啊啊啊</td>
+        <td>
+          <img
+            style="width: 100%"
+            src="https://img1.baidu.com/it/u=722430420,1974228945&fm=253&fmt=auto&app=138&f=JPEG?w=889&h=500"
+            alt=""
+            srcset=""
+          />
+        </td>
+      </tr>
+      <tr>
+        <td>fasdfa</td>
+        <td>阿斯蒂芬</td>
+        <td>啊打发</td>
+        <td>阿迪斯发</td>
+        <td>爱的色放我</td>
+        <td>的法沙发和</td>
+        <td>啊啊啊啊啊啊</td>
+        <td>啊打发</td>
+      </tr>
+    </table>
+  </body>
+</html>
