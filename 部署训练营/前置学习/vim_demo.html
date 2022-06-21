@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>职责链模式</title>
+  </head>
+  <body>
+    <script>
+      /*
+                  公司针对支付过定金的用户有一定的优惠政策。在正式购买后，已经支付过500 元定金的用
+                  户会收到100 元的商城优惠券，200 元定金的用户可以收到50 元的优惠券，而之前没有支付定金
+                  的用户只能进入普通购买模式，也就是没有优惠券，且在库存有限的情况下不一定保证能买到。
+                  我们的订单页面是PHP 吐出的模板，在页面加载之初，PHP 会传递给页面几个字段。
+                    1. orderType：表示订单类型（定金用户或者普通购买用户），code 的值为1 的时候是500 元
+                      定金用户，为2 的时候是200 元定金用户，为3 的时候是普通购买用户。
+                    2. pay：表示用户是否已经支付定金，值为true 或者false, 虽然用户已经下过500 元定金的
+                      订单，但如果他一直没有支付定金，现在只能降级进入普通购买模式。
+                    3. stock：表示当前用于普通购买的手机库存数量，已经支付过500 元或者200 元定金的用
+                      户不受此限制。
+                  */
+      // 预先定义需要使用的节点
+      var order500 = function (orderType, pay, stock) {
+        if (orderType === 1 && pay === true) {
+          console.log("500 元定金预购，得到100 优惠券");
+        } else {
+          return "nextSuccessor"; // 我不知道下一个节点是谁，反正把请求往后面传递
+        }
+      };
+      var order200 = function (orderType, pay, stock) {
+        if (orderType === 2 && pay === true) {
+          console.log("200 元定金预购，得到50 优惠券");
+        } else {
+          return "nextSuccessor"; // 我不知道下一个节点是谁，反正把请求往后面传递
+        }
+      };
+      var orderNormal = function (orderType, pay, stock) {
+        if (stock > 0) {
+          console.log("普通购买，无优惠券");
+        } else {
+          console.log("手机库存不足");
+        }
+      };
+      // 职责链节点对象，可以
+      var Chain = function (fn) {
+        this.fn = fn;
+        this.successor = null;
+      };
+      // 设置当前节点的下一个节点，并返回当前节点
+      Chain.prototype.setNextSuccessor = function (successor) {
+        return (this.successor = successor);
+      };
+      // 可以将请求交给下一个节点执行，或者当前节点执行，最后返回执行结果
+      Chain.prototype.passRequest = function () {
+        var ret = this.fn.apply(this, arguments);
+        if (ret === "nextSuccessor") {
+          return (
+            this.successor &&
+            this.successor.passRequest.apply(this.successor, arguments)
+          );
+        }
+        return ret;
+      };
+
+      // 把3 个订单函数分别包装成职责链的节点
+      var chainOrder500 = new Chain(order500);
+      var chainOrder200 = new Chain(order200);
+      var chainOrderNormal = new Chain(orderNormal);
+      // 然后指定节点在职责链中的顺序：
+      chainOrder500.setNextSuccessor(chainOrder200);
+      chainOrder200.setNextSuccessor(chainOrderNormal);
+      // 最后把请求传递给第一个节点，以下是四个请求
+      chainOrder500.passRequest(1, true, 500); // 输出：500 元定金预购，得到100 优惠券
+      chainOrder500.passRequest(2, true, 500); // 输出：200 元定金预购，得到50 优惠券
+      chainOrder500.passRequest(3, true, 500); // 输出：普通购买，无优惠券
+      chainOrder500.passRequest(1, false, 0); // 输出：手机库存不足
+
+      // ----------------------异步职责链-----------------------------
+      // 比如要在节点函数中发起一个ajax 异步请求，异步请求返回的结果才能决定是否继续在职责链中 passRequest。
+      Chain.prototype.next = function () {
+        return (
+          this.successor &&
+          this.successor.passRequest.apply(this.successor, arguments)
+        );
+      };
+      var fn1 = new Chain(function () {
+        console.log(1);
+        return "nextSuccessor";
+      });
+      var fn2 = new Chain(function () {
+        console.log(2);
+        var self = this;
+        setTimeout(function () {
+          self.next();
+        }, 1000);
+      });
+      var fn3 = new Chain(function () {
+        console.log(3);
+      });
+      fn1.setNextSuccessor(fn2).setNextSuccessor(fn3);
+      fn1.passRequest();
+
+      // ----------------------使用 AOP 来实现职责链------------------------
+      // 用AOP 来实现职责链既简单又巧妙，但这种把函数叠在一起的方式，同时也叠加了函数的
+      // 作用域，如果链条太长的话，也会对性能有较大的影响。
+      Function.prototype.after = function (fn) {
+        var self = this;
+        return function () {
+          var ret = self.apply(this, arguments);
+          if (ret === "nextSuccessor") {
+            return fn.apply(this, arguments);
+          }
+          return ret;
+        };
+      };
+      var order = order500yuan.after(order200yuan).after(orderNormal);
+      order(1, true, 500); // 输出：500 元定金预购，得到100 优惠券
+      order(2, true, 500); // 输出：200 元定金预购，得到50 优惠券
+      order(1, false, 500); // 输出：普通购买，无优惠券
+      //
+	   ----------------------用AOP职责链模式获取文件上传对象-----------------------
+      var getActiveUploadObj = function () {
+        try {
+          return new ActiveXObject("TXFTNActiveX.FTNUpload"); // IE 上传控件
+        } catch (e) {
+          return "nextSuccessor";
+        }
+      };
+      var getFlashUploadObj = function () {
+        if (supportFlash()) {
+          var str = '<object type="application/x-shockwave-flash"></object>';
+          return $(str).appendTo($("body"));
+        }
+        return "nextSuccessor";
+      };
+      var getFormUpladObj = function () {
+        return $('<form><input name="file" type="file"/></form>').appendTo(
+          $("body")
+        );
+      };
+      var getUploadObj = getActiveUploadObj
+        .after(getFlashUploadObj)
+        .after(getFormUpladObj);
+      console.log(getUploadObj());
+    </script>
+  </body>
+</html>
