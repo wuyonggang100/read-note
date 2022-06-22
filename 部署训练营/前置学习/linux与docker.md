@@ -224,6 +224,7 @@ docker commit parameter [containerID] [ImageName]:[Version]
 docker save -o /home/chw/tcnstream_ubuntu_aarch64.tar tcnstream_ubuntu_aarch64
 # 加载本地保存的镜像，然后docker images就可以看到镜像
 docker load  --input tcnstream_ubuntu_aarch64.tar
+
 ```
 
 获取 xxx 的全部镜像  tag 列表
@@ -232,6 +233,20 @@ docker load  --input tcnstream_ubuntu_aarch64.tar
 
 ```sh
 wget -q https://registry.hub.docker.com/v1/repositories/node/tags -O -  | sed -e 's/[][]//g' -e 's/"//g' -e 's/ //g' | tr '}' '\n' | awk -F: '{print $3}'
+```
+
+#### 构建自定义镜像
+
+在 Dockerfile 目录下执行以上命令即可构建镜像。`-t` 参数指定了镜像名称为 `nginx-alpine`，最后的 `.` 表示构建上下文（`.` 表示当前目录）.
+
+**在使用 `COPY` 指令复制文件时，指令中的源路径是相对于构建上下文的**（如果指定上下文为 `/home`，那么相当于所有的源路径前面都加上了 `/home/`）。
+
+如果你的 Dockerfile 文件名不是 “Dockerfile”，可以使用 `-f` 参数指定。
+
+> **千万不要将 Dockerfile 放在根目录下构建，假如你将 Dockerfile 放在一个存放大量视频目录下，并且构建上下文为当前目录，那么镜像将会非常大（视频都被打包进去了）**。最佳做法是将 Dockerfile 和需要用到的文件放在一个单独的目录下
+
+```sh
+docker build -t nginx-alpine . --file #如果 Dockerfile文件有多个，就需要指定,简写 -f
 ```
 
 
@@ -256,7 +271,8 @@ docker run --name ppocr --privileged  -p  2022:22 -v $PWD:/paddle --shm-size=256
 -p: 表示端口映射，其中2022为主机端口，22为docker端口。后面可以远程连接： ssh root@172.31.8.207:2022 ---- 2022为 -p 的主机端口。
 --privileged: 表示container内的root拥有真正的root权限。否则，container内的root只是外部的一个普通用户权限。privileged启动的容器，可以看到很多host上的设备，并且可以执行mount。甚至允许你在docker容器中启动docker容器。如果不使用此参数，docker中可能无法看到一些设备，如mlu，就无法使用。
 --shm-size=256G：这里是设置docker环境中的共享内存大小，默认是64m，太小了，后面运行程序会报错，因此在创建容器之前先在电脑上用df-h命令看一下电脑的虚拟内存大小，然后创建docker容器时设置成一样的。下面的/dev/shm就是共享内存大小。
-# 用 nginx:alpine 镜像创建一个容器，然后浏览器输入http://192.168.201.129:8888/ 就能看到 nginx 启动了，或者在宿主机输入 curl localhost:8889
+
+# nginx:1.16.1 为镜像名，用 nginx:1.16.1 镜像创建一个容器，然后浏览器输入http://192.168.201.129:8888/ 就能看到 nginx 启动了，或者在宿主机输入 curl localhost:8889
 docker run -d --name nginx -p 8888:80 nginx:1.16.1
 
 # 进入容器目录

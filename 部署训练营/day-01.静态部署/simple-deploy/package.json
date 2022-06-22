@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "serve . -p 3000",
+    "start": "serve . -p 3003",
     "start:server": "node server-fs.js",
     "learn:nginx": "docker-compose -f learn-nginx.docker-compose.yaml up"
   },
