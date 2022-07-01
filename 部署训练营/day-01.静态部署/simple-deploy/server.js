@@ -1,4 +1,4 @@
-const http = require('node:http')
+const http = require("node:http");
 
 const html = `<!DOCTYPE html>
 <html lang="en">
@@ -7,11 +7,11 @@ const html = `<!DOCTYPE html>
   <title></title>
 </head>
 <body>
-  hello, shanyue. 
+  hello, docker. 
 </body>
-</html>`
+</html>`;
 
-const server = http.createServer((req, res) => res.end(html))
+const server = http.createServer((req, res) => res.end(html));
 server.listen(3000, () => {
-  console.log('Listening 3000')
-})
+  console.log("Listening 3000");
+});

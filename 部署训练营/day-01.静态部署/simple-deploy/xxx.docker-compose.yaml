@@ -1,0 +1,8 @@
+version: "3"
+services:
+  serv1:
+    build:
+      context: .
+      dockerfile: xxx.Dockerfile
+    ports:
+      3001:3000

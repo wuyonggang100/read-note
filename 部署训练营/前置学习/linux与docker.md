@@ -1,21 +1,3 @@
-## docker 
-
-**Docker** 使用 `Google` 公司推出的 [Go 语言](https://golang.google.cn/) 进行开发实现，基于 `Linux` 内核的 [cgroup](https://zh.wikipedia.org/wiki/Cgroups)，[namespace](https://en.wikipedia.org/wiki/Linux_namespaces)，以及 [OverlayFS](https://docs.docker.com/storage/storagedriver/overlayfs-driver/) 类的 [Union FS](https://en.wikipedia.org/wiki/Union_mount) 等技术，对进程进行封装隔离，属于 [操作系统层面的虚拟化技术](https://en.wikipedia.org/wiki/Operating-system-level_virtualization)。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 [LXC](https://linuxcontainers.org/lxc/introduction/)，从 `0.7` 版本以后开始去除 `LXC`，转而使用自行开发的 [libcontainer](https://github.com/docker/libcontainer)，从 `1.11` 版本开始，则进一步演进为使用 [runC](https://github.com/opencontainers/runc) 和 [containerd](https://github.com/containerd/containerd)
-
-> `runc` 是一个 Linux 命令行工具，用于根据 [OCI容器运行时规范](https://github.com/opencontainers/runtime-spec) 创建和运行容器。
-
-> `containerd` 是一个守护程序，它管理容器生命周期，提供了在一个节点上执行容器和管理镜像的最小功能集。
-
-**Docker** 在容器的基础上，进行了进一步的封装，从文件系统、网络互联到进程隔离等等，极大的简化了容器的创建和维护。使得 `Docker` 技术比虚拟机技术更为轻便、快捷。
-
-**Docker** 和传统虚拟化方式的不同之处。传统虚拟机技术是虚拟出一套硬件后，在其上运行一个完整操作系统，在该系统上再运行所需应用进程；而容器内的应用进程直接运行于宿主的内核，容器内没有自己的内核，而且也没有进行硬件虚拟。因此容器要比传统虚拟机更为轻便。
-
-
-
-
-
-
-
 # Linux云服务器安装宝塔面板
 
 1. 虚拟机内 centos7 下载地址： 
@@ -73,6 +55,33 @@
 
    username: aqa7a7gt
    password: 76e35b4c
+
+
+
+## linux查看端口占用情况
+
+```sh
+netstat -tlnp   # 查看全部端口占用情况，被哪个程序占用，会列出 pid ;
+netstat -tlnp | grep 8888 # 查看 8888 端口被哪个程序占用
+lsof -i:8888 # 查看占用 8888端口进程的具体信息
+kill -9 35734  # 杀死 pid 为35734 的进程
+```
+
+
+
+
+
+## docker 
+
+**Docker** 使用 `Google` 公司推出的 [Go 语言](https://golang.google.cn/) 进行开发实现，基于 `Linux` 内核的 [cgroup](https://zh.wikipedia.org/wiki/Cgroups)，[namespace](https://en.wikipedia.org/wiki/Linux_namespaces)，以及 [OverlayFS](https://docs.docker.com/storage/storagedriver/overlayfs-driver/) 类的 [Union FS](https://en.wikipedia.org/wiki/Union_mount) 等技术，对进程进行封装隔离，属于 [操作系统层面的虚拟化技术](https://en.wikipedia.org/wiki/Operating-system-level_virtualization)。由于隔离的进程独立于宿主和其它的隔离的进程，因此也称其为容器。最初实现是基于 [LXC](https://linuxcontainers.org/lxc/introduction/)，从 `0.7` 版本以后开始去除 `LXC`，转而使用自行开发的 [libcontainer](https://github.com/docker/libcontainer)，从 `1.11` 版本开始，则进一步演进为使用 [runC](https://github.com/opencontainers/runc) 和 [containerd](https://github.com/containerd/containerd)
+
+> `runc` 是一个 Linux 命令行工具，用于根据 [OCI容器运行时规范](https://github.com/opencontainers/runtime-spec) 创建和运行容器。
+
+> `containerd` 是一个守护程序，它管理容器生命周期，提供了在一个节点上执行容器和管理镜像的最小功能集。
+
+**Docker** 在容器的基础上，进行了进一步的封装，从文件系统、网络互联到进程隔离等等，极大的简化了容器的创建和维护。使得 `Docker` 技术比虚拟机技术更为轻便、快捷。
+
+**Docker** 和传统虚拟化方式的不同之处。传统虚拟机技术是虚拟出一套硬件后，在其上运行一个完整操作系统，在该系统上再运行所需应用进程；而容器内的应用进程直接运行于宿主的内核，容器内没有自己的内核，而且也没有进行硬件虚拟。因此容器要比传统虚拟机更为轻便。
 
 ### 安装 docker
 
@@ -180,8 +189,6 @@ umount /var/lib/docker/devicemapper
    
 
 ### docker 容器与镜像命令
-
-> 一个容器只能基于一个镜像创建，比如需要启个 node 服务，就要开一个容器，再启一个 nginx 服务，又要开一个容器；同一个镜像可以用来创建多次容器；
 
 1、镜像命令
 
@@ -308,12 +315,36 @@ docker rmi $(docker images -q)
 docker ps # 查看当前运行的容器
 docker ps -a # 查看所有容器，包括运行和不运行的
 docker rm 容器ID # 删除容器
-docker port nginx # 查看 nginx 容器端口映射 80/tcp -> 0.0.0.0:8888
+docker port nginx # 查看 nginx 容器端口映射， 80/tcp -> 0.0.0.0:8888，容器停止时就没有信息
 docker stats # 查看容器资源占用
 
 docker rename 旧名 新名 # 给容器重命名
 docker rename nginx:1.16.1 nginx # 先给 name 为nginx:1.16.1容器改名为 nginx，再将id 为nginx:1.16.1 的容器改名为 nginx;
 ```
+
+### 容器与镜像
+
+1. 一个容器只能基于一个镜像创建，比如需要启个 node 服务，就要开一个容器，再启一个 nginx 服务，又要开一个容器；同一个镜像可以用来创建多次容器；镜像是类，容器就是实例；
+
+2. 容器 A 依赖镜像 a 建立，必须先关掉容器A的运行，然后才能删除容器A，进而才能删掉镜像 a ；
+
+3. 容器有7种状态，可以从 docker ps -a 列表中看到  status ；
+
+   ```sh
+   created（已创建）
+   restarting（重启中）
+   running（运行中）# Up About a minute 运行了一分钟
+   removing（迁移中）
+   paused（暂停）
+   exited（停止）
+   dead（死亡）
+   ```
+
+   
+
+
+
+
 
 
 
@@ -394,7 +425,119 @@ Compose 通过一个配置文件来管理多个Docker容器，在配置文件中
 
 Docker从1.13.x版本开始，版本分为企业版EE和社区版CE，版本号也改为按照时间线来发布，比如17.03就是2017年3月。
 
-Docker的社区版（Docker Community Edition）叫做docker-ce。老版本的Docker包叫做docker或者docker-engine，如果安装了老版本的docker得先卸载然后再安装新版本的docker。docker的发展非常迅速，apt源的更新往往比较滞后。所以docker官网推荐的安装方式都是下载docker安装脚本安装。 
+Docker的社区版（Docker Community Edition）叫做docker-ce。老版本的Docker包叫做docker或者docker-engine，如果安装了老版本的docker得先卸载然后再安装新版本的docker。docker的发展非常迅速，apt源的更新往往比较滞后。所以docker官网推荐的安装方式都是下载docker安装脚本安装。
+
+###  docker-compose 安装
+
+**Docker默认安装环境下是不包含Docker Compose工具的，需要单独安装**。Docker Compose工具搭配Docker才有意义，所以安装Docker Compose之前需要安装Docker。
+
+**其实Docker Compose是一个可执行文件**，直接下载对应文件即可，执行如下命令：
+
+```bash
+# 下载Docker Compose文件， 这个地址下载比较慢
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# 这个地址快点
+sudo curl -L "https://get.daocloud.io/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+```
+
+### 授予执行权限
+
+下载下来的文件默认是没有执行权限的，后续需要执行，所以得授予执行权限，执行如下命令即可：
+
+```bash
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+看看权限结果分配如下：
+
+![image-20220628102708958](linux与docker.assets/image-20220628102708958.png)
+
+### 卸载
+
+如果需要卸载，直接删除即可，执行如下命令即可：
+
+```bash
+sudo rm /usr/local/bin/docker-compose
+```
+
+## docker-compose.yaml 文件
+
+- 可以定义多个服务，然后启动的时候可以启动全部或部分服务；
+
+  ```yaml
+  version: "3"
+  services:
+    ode-app:
+      build:
+        context: .
+        dockerfile: node.Dockerfile
+      ports:
+        - 3002:3000
+    api:
+      image: shanyue/whoami
+      ports:
+        - 8888:3000
+    nginx:
+      image: nginx:alpine
+      ports:
+        - 8000:80
+      volumes:
+        - ./nginx.conf:/etc/nginx/conf.d/default.conf
+        - .:/usr/share/nginx/html
+    location:
+      image: nginx:alpine
+      ports:
+        - 8100:80
+      volumes:
+        - ./location.conf:/etc/nginx/conf.d/default.conf
+        - .:/usr/share/nginx/html
+  ```
+
+- 启动
+
+  ```sh
+  docker-compose up -d location2 api  # 只启动location2 和 api 这两个服务
+  docker-compose up -d  # 启动全部服务
+  ```
+
+  
+
+
+
+## docker-compose 命令
+
+```sh
+# up: 创建并启动容器， 其后的 xxx 为创建的容器 name 
+# --build: 每次启动容器前构建镜像，如果镜像已经存在就会更新镜像
+# --detach 后台运行，简写 -d, 只能跟在 up 后面
+# -f 指定其后的 yaml 文件为构建文件， --file 的简写，默认为docker-compose.yml
+$ docker-compose -f learn-nginx.docker-compose.yaml up -d --build  learn-nginx
+```
+
+常见命令
+
+```sh
+docker-compose 命令 --help                     获得一个命令的帮助
+docker-compose up -d nginx                     构建启动nignx服务
+docker-compose exec nginx bash                 登录到nginx容器中
+docker-compose down                            此命令将会停止 up 命令所启动的容器，并移除网络
+docker-compose ps                              列出项目中目前的所有容器,后面不能带 -a
+docker-compose restart nginx                   重新启动nginx容器
+docker-compose build nginx                     构建镜像 
+docker-compose build --no-cache nginx          不带缓存的构建
+docker-compose top                             查看各个服务容器内运行的进程 
+docker-compose logs -f nginx                   查看nginx的实时日志
+docker-compose images                          列出 Compose 文件包含的镜像
+docker-compose config                          验证文件配置，当配置正确时，不输出任何内容，当文件配置错误，输出错误信息。 
+docker-compose events --json nginx             以json的形式输出nginx的docker日志
+docker-compose pause nginx                     暂停nignx容器
+docker-compose unpause nginx                   恢复ningx容器
+docker-compose rm nginx                        删除容器（删除前必须关闭容器，执行stop）
+docker-compose stop nginx                      停止nignx容器
+docker-compose start nginx                     启动nignx容器
+docker-compose restart nginx                   重启项目中的nignx容器
+docker-compose run --no-deps --rm php-fpm php -v   在php-fpm中不启动关联容器，并容器执行php -v 执行完成后删除容器
+```
 
 
 
