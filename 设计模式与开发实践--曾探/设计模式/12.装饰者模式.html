@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      var Plane = function () {};
+      Plane.prototype.fire = function () {
+        console.log('发射普通子弹');
+      };
+      // 接下来增加两个装饰类，分别是导弹和原子弹
+      var MissileDecorator = function (plane) {
+        this.plane = plane;
+      };
+      MissileDecorator.prototype.fire = function () {
+        this.plane.fire();
+        console.log('发射导弹');
+      };
+      var AtomDecorator = function (plane) {
+        this.plane = plane;
+      };
+      AtomDecorator.prototype.fire = function () {
+        this.plane.fire();
+        console.log('发射原子弹');
+      };
+      var plane = new Plane();
+      plane = new MissileDecorator(plane);
+      plane = new AtomDecorator(plane);
+      plane.fire();
+      // 分别输出： 发射普通子弹、发射导弹、发射原子弹
+
+      // ------------不使用类实现----------------------
+      var plane = {
+        fire: function () {
+          console.log('发射普通子弹');
+        },
+      };
+      var missileDecorator = function () {
+        console.log('发射导弹');
+      };
+      var atomDecorator = function () {
+        console.log('发射原子弹');
+      };
+      var fire1 = plane.fire;
+      plane.fire = function () {
+        fire1();
+        missileDecorator();
+      };
+      var fire2 = plane.fire;
+      plane.fire = function () {
+        fire2();
+        atomDecorator();
+      };
+      plane.fire();
+      // 分别输出： 发射普通子弹、发射导弹、发射原子弹
+
+      // ---------------------AOP 切面编程----------------------------
+
+      // 将业务代码和数据统计代码分离解耦
+      Function.prototype.after = function (afterfn) {
+        var __self = this;
+        return function () {
+          var ret = __self.apply(this, arguments);
+          afterfn.apply(this, arguments);
+          return ret;
+        };
+      };
+      var showLogin = function () {
+        console.log('打开登录浮层');
+      };
+      var log = function () {
+        console.log('上报标签为: ' + this.getAttribute('tag'));
+      };
+      showLogin = showLogin.after(log); // 打开登录浮层之后上报数据
+      document.getElementById('button').onclick = showLogin;
+      // 动态改变函数的参数
+      // 通过 Function.prototype.before 方法给函数 func 的参数 param 动态地添加属性 b：
+      var func = function (param) {
+        console.log(param); // 输出： {a: "a", b: "b"}
+      };
+      func = func.before(function (param) {
+        param.b = 'b';
+      });
+      func({ a: 'a' });
+
+      // 通过 Function.prototyte.before 将 token 装饰到 ajax 函数的参数 param 对象，给每个请求带上 token；
+      var getToken = function () {
+        return 'Token';
+      };
+      ajax = ajax.before(function (type, url, param) {
+        param.Token = getToken();
+      });
+      ajax('get', 'http:// xxx.com/userinfo', { name: 'sven' });
+
+      // 修改 Function.prototype.before 方法将表单的校验输入和提交两部分完全分离开；
+      Function.prototype.before = function (beforefn) {
+        var __self = this;
+        return function () {
+          if (beforefn.apply(this, arguments) === false) {
+            // beforefn 返回 false 的情况直接 return，不再执行后面的原函数
+            return;
+          }
+          return __self.apply(this, arguments);
+        };
+      };
+      var validata = function () {
+        if (username.value === '') {
+          alert('用户名不能为空');
+          return false;
+        }
+        if (password.value === '') {
+          alert('密码不能为空');
+          return false;
+        }
+      };
+      var formSubmit = function () {
+        var param = {
+          username: username.value,
+          password: password.value,
+        };
+        ajax('http:// xxx.com/login', param);
+      };
+      formSubmit = formSubmit.before(validata);
+      submitBtn.onclick = function () {
+        formSubmit();
+      };
+    </script>
+  </body>
+</html>
