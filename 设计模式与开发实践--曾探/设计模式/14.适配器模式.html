@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>适配器模式</title>
+  </head>
+  <body>
+    <script>
+      //  ---------------------地图 api 兼容--------------------------
+      var googleMap = {
+        show: function () {
+          console.log('开始渲染谷歌地图');
+        },
+      };
+      var baiduMap = {
+        display: function () {
+          console.log('开始渲染百度地图');
+        },
+      };
+      //  适配器模式将不同的 api 接通
+      var baiduMapAdapter = {
+        show: function () {
+          return baiduMap.display();
+        },
+      };
+      renderMap(googleMap); // 输出：开始渲染谷歌地图
+      renderMap(baiduMapAdapter); // 输出：开始渲染百度地图
+
+      //  ------------------数据格式适配得到目标格式的数据-------------------
+      var getGuangdongCity = function () {
+        var guangdongCity = [
+          {
+            name: 'shenzhen',
+            id: 11,
+          },
+          {
+            name: 'guangzhou',
+            id: 12,
+          },
+        ];
+        return guangdongCity;
+      };
+      var render = function (fn) {
+        console.log('开始渲染广东省地图');
+        document.write(JSON.stringify(fn()));
+      };
+
+      // 使用适配器将数据转换成目标格式
+      var addressAdapter = function (oldAddressfn) {
+        var address = {},
+          oldAddress = oldAddressfn();
+        for (var i = 0, c; (c = oldAddress[i++]); ) {
+          address[c.name] = c.id;
+        }
+        return function () {
+          return address;
+        };
+      };
+      render(addressAdapter(getGuangdongCity));
+    </script>
+  </body>
+</html>
