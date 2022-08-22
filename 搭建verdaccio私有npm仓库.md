@@ -43,18 +43,18 @@ pm2 delete verdaccio | pid 	  # 将应用从pm2列表中删除
 
 ### 2.1、新建目录 verdaccio 如下
 
-> tree verdaccio /F
-
 ```sh
 ├─verdaccio
    │  docker-compose.yaml
    │
    ├─conf
-   │      config.yaml # 配置文件，配置见后文
-   │      htpasswd # 空文件
+   │      config.yaml
+   │      htpasswd
    │
-   └─storage # 用来存储包的空目录
+   └─storage
 ```
+
+
 
 ### 2.2、使用 docker-compose 启动服务
 
@@ -74,7 +74,7 @@ services:
       - './plugins:/verdaccio/plugins'
 ```
 
-启动命令见下一步，启动后在浏览器中访问 192.168.209.129:4873，可以看到页面显示  ``No Package Published Yet``
+启动后在浏览器中访问 192.168.209.129:4873，可以看到页面；
 
 # 四、添加用户
 
@@ -85,8 +85,6 @@ services:
 ```sh
 docker-compose up --build verdaccio  # 前台运行 verdaccio
 docker logs --tail 20 verdaccio # 打印最后 20 条日志
-
-docker-compose up -b --build verdaccio # 当验证可以使用无误后可以在后台运行
 ```
 
 ### 2、添加用户以及权限报错解决
@@ -131,10 +129,12 @@ nrm ls
 nrm add mynpm http://192.168.201.129:4873
 # 使用指定源(即登录npm)
 nrm use mynpm
+# 等同于 npm set registry http://192.168.201.129:4873
 # 添加用户(跟随提示填写用户名、密码、邮箱即可)
 npm adduser
 # 删除用户(注册的用户信息会存储在 ~/.config/verdaccio/htpasswd 文件中,打开文件，删除对应的记录)
 sudo vim ~/.config/verdaccio/htpasswd
+npm who am i # 查看当前登录用户是谁
 ```
 
 六、上传和下载
