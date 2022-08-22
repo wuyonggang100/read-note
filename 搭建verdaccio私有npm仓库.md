@@ -260,3 +260,16 @@ log:
 ```
 
 **如果访问不了，可能需要开放防火墙端口，并且重启防火墙配置**
+
+
+
+当出现下面问题错误的时候，说明你的npm包太大，超过限制
+413 Payload Too Large - PUT http://xxx- request entity too large
+
+此时找到verdaccio的config.yaml,如：
+/root/.config/verdaccio/config.yaml
+
+修改
+max_body_size: 100mb
+
+重启verdaccio 就可以解决
