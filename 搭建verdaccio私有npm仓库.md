@@ -149,6 +149,24 @@ npm who am i # 查看当前登录用户是谁
    yarn add axios
    ```
 
+   - 对某个项目指定 npm 源
+
+     开发中，可以在项目根目录下创建 .npmrc 文件 , 输入如下，通过命令`npm config ls`查看当前项目下的registry是否发生了变化，npm源地址只在此项目中生效，并不会对全局npm的配置影响，可以在别的终端上通过命令`npm config ls`进行验证；
+
+     ```sh
+     registry="http://192.168.201.129:4873/" # 指定npm源
+     ```
+
+   - 对某个项目指定上传仓库地址
+
+     在package.json文件中，添加`publishConfig`属性，这样可以指定npm源发布仓库（可以用于公司的npm私库）*需要提前登录*，
+
+     ```json
+     "publishConfig": {
+         "registry": "http://xxxxx/"
+     }
+     ```
+
 2. 上传
 
    > 如果使用私库的账号登录的，就可以不带后缀，直接 `` npm publish``  ， 此命令需要在被上传的包根目录下执行
