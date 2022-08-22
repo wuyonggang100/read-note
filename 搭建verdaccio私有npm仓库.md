@@ -10,8 +10,6 @@ https://verdaccio.org/docs/what-is-verdaccio
 npm i verdaccio -g 
 ```
 
-
-
 ### 1.2、 运行 verdaccio 
 
 > 启动 ，然后就能访问， 默认 4873端口，可以修改 ；
@@ -43,21 +41,40 @@ pm2 delete verdaccio | pid 	  # 将应用从pm2列表中删除
 
 # 二、在 docker 中使用
 
-### 2.1、翻译成 dockerfile 镜像
+### 2.1、新建目录 verdaccio 如下
 
-```dockerfile
-FROM node:14-alpine
-RUN yarn add verdaccio global
-RUN verdaccio --listen 4000 --config ~./config.yaml
+> tree verdaccio /F
+
+```sh
+├─verdaccio
+   │  docker-compose.yaml
+   │
+   ├─conf
+   │      config.yaml # 配置文件，配置见后文
+   │      htpasswd # 空文件
+   │
+   └─storage # 用来存储包的空目录
 ```
 
 ### 2.2、使用 docker-compose 启动服务
 
 ```dockerfile
+version: '3'
 
+services:
+  verdaccio:
+    image: verdaccio/verdaccio:5.5
+    container_name: verdaccio
+    restart: always
+    ports:
+      - '4873:4873'
+    volumes:
+      - './storage:/verdaccio/storage'
+      - './conf:/verdaccio/conf'
+      - './plugins:/verdaccio/plugins'
 ```
 
-启动后在浏览器中访问 192.168.209.129:4873，可以看到页面；
+启动命令见下一步，启动后在浏览器中访问 192.168.209.129:4873，可以看到页面显示  ``No Package Published Yet``
 
 # 四、添加用户
 
@@ -68,6 +85,8 @@ RUN verdaccio --listen 4000 --config ~./config.yaml
 ```sh
 docker-compose up --build verdaccio  # 前台运行 verdaccio
 docker logs --tail 20 verdaccio # 打印最后 20 条日志
+
+docker-compose up -b --build verdaccio # 当验证可以使用无误后可以在后台运行
 ```
 
 ### 2、添加用户以及权限报错解决
@@ -92,7 +111,7 @@ sudo chown -R 10001:65533 storage # 在verdaccio 目录下运行
 
 再次添加用户，就能添加成功了；
 
-> 添加用户成功以后在 htpasswd 文件中可以看到用户信息
+> 添加用户成功以后在 htpasswd 文件中可以看到用户信息如下
 
 ```sh
 zhangsan:1aIvkKi3bjiNE:autocreated 2022-08-19T09:10:32.958Z
@@ -109,7 +128,7 @@ nrm -h
 # 列出当前 nrm 存储的npm源
 nrm ls
 # 添加用户自定义的源
-nrm add mynpm 192.168.0.118:4873
+nrm add mynpm http://192.168.201.129:4873
 # 使用指定源(即登录npm)
 nrm use mynpm
 # 添加用户(跟随提示填写用户名、密码、邮箱即可)
@@ -120,7 +139,36 @@ sudo vim ~/.config/verdaccio/htpasswd
 
 六、上传和下载
 
+> 需要先将npm 源设置为私库地址，此时没有上传过包，会显示  ``No Package Published Yet``, 只有向私库 publish 上传过包才会显示包列表，下载的不算；
 
+1. 下载
+
+   ```sh
+   npm i axios  
+   或者
+   yarn add axios
+   ```
+
+2. 上传
+
+   > 如果使用私库的账号登录的，就可以不带后缀，直接 `` npm publish``  ， 此命令需要在被上传的包根目录下执行
+
+   ```sh
+   npm publish
+   或者
+   npm publish --registry http://192.168.201.129:4873/
+   ```
+
+3. 删除
+
+   > 需要指定包名和版本
+
+   ```sh
+   npm unpublish mynpm_test@1.0.0 
+   或者
+   npm unpublish mynpm_test@1.0.0 --registry http://192.168.201.
+   129:4873/
+   ```
 
 七、配置文件 config.yaml
 
@@ -146,7 +194,7 @@ auth:
     max_users: 2 # 最多可以注册 2 个用户
     # hash 算法，选项可以是 "bcrypt", "md5", "sha1", "crypt"，默认 crypt
     algorithm: bcrypt
-    # “bcrypt”的轮数，对于其他算法将被忽略,值设的越高，验证所需时间越久，大于 10 时 CPU 使用率显着增加，并在处理请求时产生额外的延迟
+    # “bcrypt”的轮数，对于其他算法将被忽略,值设的越高，验证所需时间越久，大于 10 时 CPU 使用率显著增加，并在处理请求时产生额外的延迟
     rounds: 10
     # 如果密码的验证时间超过此持续时间（以毫秒为单位），则记录警告
     slow_verify_ms: 200
@@ -156,6 +204,7 @@ security:
       sign:
         expiresIn: 60d
         notBefore: 1
+  #  
   web:
     sign:
       expiresIn: 7d
@@ -211,53 +260,3 @@ log:
 ```
 
 **如果访问不了，可能需要开放防火墙端口，并且重启防火墙配置**
-
-
-
-
-
-- listen: 监听的端口，可以修改
-
-- storage： 仓库保存的地址，publish时仓库保存的地址。
-
-- auth： htpasswd file：账号密码的文件地址，初始化时不存在，可指定需要手工创建。
-  max_users：默认1000，为允许用户注册的数量。为-1时，不允许用户通过npm adduser注册。但是，当为-1时，可以通过直接编写htpasswd file内容的方式添加用户。
-  语法：用户名:{SHA}哈希加密的字符=:autocreated 时间
-  加密算法：SHA1哈稀之后再转换成 Base64 输出就好
-
-- uplinks: 配置上游的npm服务器，主要用于请求的仓库不存在时到上游服务器去拉取。
-
-- packages: 配置模块。
-
-  > - access    访问下载权限,
-  >
-  > - publish   包的发布权限。格式如下：
-  >
-  >   ```sh
-  >   scope:
-  >   权限：操作
-  >   ```
-
-  - scope:两种模式
-    一种是 @/ 表示某下属的某项目
-    另一种是 * 匹配项目名称(名称在package.json中有定义)
-  - 权限：
-    l access: 表示哪一类用户可以对匹配的项目进行安装(install)
-    l publish: 表示哪一类用户可以对匹配的项目进行发布(publish)
-    l proxy: 如其名，这里的值是对应于 uplinks 的名称，如果本地不存在，允许去对应的uplinks去取。
-    操作：
-
-  l $all 表示所有人(已注册、未注册)都可以执行对应的操作
-  l $authenticated 表示只有通过验证的人(已注册)可以执行对应操作，注意，任何人都可以去注册账户。
-  l $anonymous 表示只有匿名者可以进行对应操作（通常无用）
-  l 或者也可以指定对应于之前我们配置的用户表 htpasswd 中的一个或多个用户，这样就明确地指定哪些用户可以执行匹配的操作
-  听端口和主机名。
-  localhost:4873 　　　　 #默认
-  0.0.0.0:4873　　　　　　 #在所有网卡监听
-
-- 代理
-
-  #http_proxy: http://something.local/  #http代理
-  #https_proxy: https://something.local/  #https代理
-  #no_proxy: localhost,127.0.0.1  #不适用代理的iP
-
