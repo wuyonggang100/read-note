@@ -161,4 +161,83 @@ WARNING! This will remove:
 
 # 七、docker-compose
 
-# 八、docker 网络
+> https://deepzz.com/post/docker-compose-file.html#toc_31
+
+# 八、docker network
+
+详见 [简书](https://www.jianshu.com/p/3004fbce4d37?u_atoken=7e5eba42-1461-4424-b80d-0b3afc9110f7&u_asession=01VvzYaV_gHsrNjhLE1Su1GAfzk6LJv2mhgtQApNYZIFxL14G2rBZrQE7vxx7NDh_dX0KNBwm7Lovlpxjd_P_q4JsKWYrT3W_NKPr8w6oU7K8nD5cfoNoTK_6GA3wyon3mCvvWHyhA8I9G3hxoTho1LGBkFo3NEHBv0PZUm6pbxQU&u_asig=05qqfmDpV5jnzQ3zaOR-kKvo9GIyPSEU9bw8mlVlMVGppZ9pJxMONfYVqMxov9SKyxJiyccUUyR3518TpSIGyIwgwM6toykM2wPEZonwQg5YNHdY_SbRZxvoGKF3gNR6FYRi54SlC2WoHrOabV4aW_IeoqMN8dtl6KGO3T8OB_mdz9JS7q8ZD7Xtz2Ly-b0kmuyAKRFSVJkkdwVUnyHAIJzUrY0QhB-Ma-EqxeO6vNS5HipymZkD-PpMAPXZfii-1IChTz2MQxpCmDDGYlh3aZze3h9VXwMyh6PgyDIVSG1W9HRCuSkoPezGK-B_JV3Q83S0gA-YCVD9qXtlq4leRItDdgzKzNqrrWi9_-2TUYxFyUe5pNRJDtrRTZ4ViTRkgFmWspDxyAEEo4kbsryBKb9Q&u_aref=QNV%2BNasOaPsJ%2ByEz0C1U11jPt0o%3D)
+
+详见 [博客](http://www.zzvips.com/article/145198.html)
+
+> 在 docker-compose 配置中使用同一个网络的容器服务可以互相访问，类似于这些服务在一个小的局域网中，可以使用 127.0.0.1 访问；不同名的网络服务不能互相访问；
+
+- **1. 未显式声明网络环境的docker-compose.yml**
+  - 例如在目录`app`下创建docker-compose.yml，使用`docker-compose up`启动容器后，这些容器都会被加入`app_default`网络中。使用`docker network ls`可以查看网络列表，`docker network inspect <container id>`可以查看对应网络的配置，默认网络名为  "目录名_default"
+
+# 九、traefik
+
+Traefik 是一个云原生的新型的 HTTP 反向代理、负载均衡软件。
+
+#### Traefix可以做什么
+
+- 网关/代理请求：拦截并路由每个传入的请求，根据路由规则，作为外部请求与服务的中间代理
+- 服务发现：无需重启，自动检测服务，自动更新路由规则
+- 云原生：即专门为微服务等云端技术设计，兼容许多种集群技术
+- 负载均衡：自动负载均衡
+- 证书：支持自动配置HTTPS证书
+- 服务监控管理：Web UI查看和管理各容器的运行
+
+**服务发现：** 经[demo](https://github.com/wind8866/example/blob/main/traefik/README.md#使用方法)测试，先启动traefik服务，再启动其他服务，traefik会自动发现并代理服务。
+
+**自动负载均衡例子：** 只需将docker服务的实例增加至大于一个，docker将会自动发现服务并进行负载均衡。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
