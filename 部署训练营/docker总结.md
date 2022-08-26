@@ -161,7 +161,7 @@ WARNING! This will remove:
 
 # 七、docker-compose
 
-> https://deepzz.com/post/docker-compose-file.html#toc_31
+完整配置解释见 [完整配置](https://deepzz.com/post/docker-compose-file.html#toc_31)
 
 # 八、docker network
 
@@ -172,11 +172,94 @@ WARNING! This will remove:
 > 在 docker-compose 配置中使用同一个网络的容器服务可以互相访问，类似于这些服务在一个小的局域网中，可以使用 127.0.0.1 访问；不同名的网络服务不能互相访问；
 
 - **1. 未显式声明网络环境的docker-compose.yml**
-  - 例如在目录`app`下创建docker-compose.yml，使用`docker-compose up`启动容器后，这些容器都会被加入`app_default`网络中。使用`docker network ls`可以查看网络列表，`docker network inspect <container id>`可以查看对应网络的配置，默认网络名为  "目录名_default"
+
+  - 例如在目录`app`下创建docker-compose.yml，使用`docker-compose up`启动容器后，这些容器都会被加入`app_default`网络中。使用`docker network ls`可以查看网络列表，`docker network inspect <container id>`可以查看对应网络的配置，默认网络名为  "目录名_default"；
+
+- **2. networks关键字指定自定义网络**
+
+  例如下面的docker-compose.yml文件，定义了front和back网络，实现了网络隔离。其中proxy和db之间只能通过app来实现通信。其中，`custom-driver-1`并不能直接使用，你应该替换为`host, bridge, overlay`等选项中的一种。
+
+  这里定义了back和front两个网络，似乎它们的名字就定义成了back和font，但是你使用`docker network ls`命令并不能找到它们。假如你是在`myApp`目录下运行的`docker-compose up`命令，那么这两个网络应该分别对应`myApp_back`和`myApp_front`
+
+  ```sh
+  version: '3'
+   
+  services:
+   proxy:
+    build: ./proxy
+    networks:
+     - front
+   app:
+    build: ./app
+    networks:
+     - front
+     - back
+   db:
+    image: postgres
+    networks:
+     - back
+   
+  networks:
+   front:
+    # Use a custom driver
+    driver: custom-driver-1
+   back:
+    # Use a custom driver which takes special options
+    driver: custom-driver-2
+    driver_opts:
+     foo: "1"
+     bar: "2"123456789101112131415161718192021222324252627
+  ```
+
+- ##### 3.配置默认网络
+
+  不指定网络时，默认的网络也是可以配置的。不配置的话，默认是使用：`brige`，也可以修改为其他的；
+
+  ```sh
+  version: "3"
+  services:
+  
+    web:
+      build: .
+      ports:
+        - "8000:8000"
+    db:
+      image: postgres
+  
+  networks:
+    default:
+      # Use a custom driver
+      driver: custom-driver-1
+  ```
+
+  
+
+- ##### 4. 使用已经存在的网络
+
+  多个容器，不在相同的配置中，也会有网络通讯的需求 。那么就可以使用公共的网络配置。容器可以加入到已经存在的网络。
+
+  ```sh
+  networks:
+    default:
+      external:
+        name: my-pre-existing-network
+  ```
+
+  
 
 # 九、traefik
 
 Traefik 是一个云原生的新型的 HTTP 反向代理、负载均衡软件。
+
+[traefik中文手册](https://www.mianshigee.com/tutorial/traefik/1.md)
+
+手册新手入门中有一处错误 ，如下：
+
+``` 
+docker-compose scale whoami=2  
+要改为 
+docker-compose up --scale whoami=2
+```
 
 #### Traefix可以做什么
 
@@ -190,6 +273,12 @@ Traefik 是一个云原生的新型的 HTTP 反向代理、负载均衡软件。
 **服务发现：** 经[demo](https://github.com/wind8866/example/blob/main/traefik/README.md#使用方法)测试，先启动traefik服务，再启动其他服务，traefik会自动发现并代理服务。
 
 **自动负载均衡例子：** 只需将docker服务的实例增加至大于一个，docker将会自动发现服务并进行负载均衡。
+
+完整 docker-compose 配置如下
+
+```sh
+
+```
 
 
 
