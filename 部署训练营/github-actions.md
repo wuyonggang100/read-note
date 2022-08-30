@@ -1,6 +1,74 @@
-## github-actions 中文文档
+## github-actions 
 
-  https://docs.github.com/cn/actions
+中文文档  https://docs.github.com/cn/actions
+
+## 概述
+
+任意 github 仓库都可以使用 github pages 部署，公开仓库是免费的，私有仓库需要升级后收费才可以；
+
+## 实战
+
+1. github 上新建 xxx 公开仓库；
+
+2. 选择指定分支作为部署源；
+
+   > - 依次进入此仓库的 settings ---> 左侧 pages --> Build and deployment --> 选择分支作为部署源(deploy from a branch) ---> 选择指定分支 (branch) ---> save ; 
+   > - 如果没有目标分支，可以先走后面的步骤，等到 deploy 后会创建一个新分支，此时再选择部署分支也可以；
+
+3. 编写 github action 配置文件。
+
+   1. 在项目根目录下创建 .github/workflows/xxx.yml ; 
+
+      > xxx 可以自定义
+
+   2. 加入以下代码
+
+      > 简单描述下就是：当此项目的 main 分支被 push 时，就会触发部署，会将编译后的代码推送到 gh-pages 分支，此分支名可以自定义；
+
+      ```yml
+      name: 'github actions build and deploy vue-press'
+      on:
+        push:
+          # 此此项目的 master 为源码分支，当此分支被 push 时 ，就触发 action deploy
+          branches:
+            - main
+      jobs:
+        build-and-deploy:
+          # 使用 ubuntu 服务器
+          runs-on: ubuntu-latest
+          steps:
+            # 拉取代码
+            - name: Checkout
+              uses: actions/checkout@v2.3.1
+              with:
+                persist-credentials: false
+            - name: install and build
+              run: |
+                npm install
+                npm run build
+      
+            - name: Deploy
+              # 使用别人写好的 action 部署
+              uses: JamesIves/github-pages-deploy-action@releases/v3
+              with:
+                # ACCESS_TOKEN 需要到 github 上去增加一个secrets，并命名为 ACCESS_TOKEN
+                ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      
+                # GITHUB_TOKEN 为内置变量，无需在secrets手动添加
+                # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+                # 将本仓库的 gh-pages 分支作为静态部署分支，前提是此仓库为分私有仓库，
+                BRANCH: gh-pages
+                FOLDER: docs/.vuepress/dist
+      ```
+
+   3. 进入此项目的 actions ，可以看到 action 流程，进一步可以看到详细信息。部署成功后，访问 username.github.io/xxx 就可以看到部署的静态站点页面了；
+
+      > username 是 github 账号，xxx 是项目仓库名
+
+
+
+
 
 ## 基础概念与术语
 
@@ -32,7 +100,9 @@
 
 
 
+github  action  token
 
+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
 
 
 
