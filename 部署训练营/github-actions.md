@@ -2,6 +2,8 @@
 
 中文文档  https://docs.github.com/cn/actions
 
+通过查看 [官方 Actions](https://link.juejin.cn/?target=https://github.com/marketplace?type=actions) 和 [awesome-actions](https://link.juejin.cn/?target=https://github.com/sdras/awesome-actions)，找到所需的 Actions:
+
 ## 一、giuthub pages
 
 ### 概述
@@ -31,7 +33,7 @@
       name: 'github actions build and deploy vue-press'
       on:
         push:
-          # 项目的 main 为源码分支，当此分支被 push 时 ，就触发 action deploy
+          # 此此项目的 main 为源码分支，当此分支被 push 时 ，就触发 action deploy
           branches:
             - main
       jobs:
@@ -41,9 +43,21 @@
           steps:
             # 拉取代码
             - name: Checkout
+              # 使用已有的action
               uses: actions/checkout@v2.3.1
               with:
                 persist-credentials: false
+            - name: Cache
+              # cache 在这里主要用于缓存 npm，提升构建速率
+              # https://github.com/actions/cache
+              uses: actions/cache@v2
+              # npm 缓存的路径可查看 https://docs.npmjs.com/cli/cache#cache
+              # 由于这里 runs-on 是 ubuntu-latest，因此配置 ~/.npm
+              with:
+                path: ~/.npm
+                key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+                restore-keys: |
+                  ${{ runner.os }}-node-
             - name: install and build
               run: |
                 npm install
@@ -59,9 +73,10 @@
                 # GITHUB_TOKEN 为内置变量，无需在secrets手动添加
                 # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
-                # 将本仓库的 gh-pages 分支作为静态部署分支，前提是此仓库为分私有仓库，
+                # 将本仓库的 gh-pages 分支作为静态部署分支，前提是此仓库为公开仓库，私有仓库会收费，
                 BRANCH: gh-pages
                 FOLDER: docs/.vuepress/dist
+      
       ```
 
    3. 进入此项目的 actions ，可以看到 action 流程，进一步可以看到详细信息。部署成功后，访问 username.github.io/xxx 就可以看到部署的静态站点页面了；
