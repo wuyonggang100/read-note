@@ -1,12 +1,14 @@
-## github-actions 
+# github-actions 
 
 中文文档  https://docs.github.com/cn/actions
 
-## 概述
+## 一、giuthub pages
+
+### 概述
 
 任意 github 仓库都可以使用 github pages 部署，公开仓库是免费的，私有仓库需要升级后收费才可以；
 
-## 实战
+### 实战
 
 1. github 上新建 xxx 公开仓库；
 
@@ -29,7 +31,7 @@
       name: 'github actions build and deploy vue-press'
       on:
         push:
-          # 此此项目的 master 为源码分支，当此分支被 push 时 ，就触发 action deploy
+          # 项目的 main 为源码分支，当此分支被 push 时 ，就触发 action deploy
           branches:
             - main
       jobs:
@@ -66,7 +68,7 @@
 
       > username 是 github 账号，xxx 是项目仓库名
 
-
+## 二、定时任务
 
 
 
@@ -93,16 +95,6 @@
 3. **分支必须 CI 成功才能合并到主分支**
 4. 代码必须经过 Code Review (关于该 PR 下的所有 Review 必须解决)
 5. 代码必须两个人同意才能合并到主分支
-
-
-
-
-
-
-
-github  action  token
-
-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
 
 
 
