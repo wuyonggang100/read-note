@@ -4,6 +4,8 @@
 
 通过查看 [官方 Actions](https://link.juejin.cn/?target=https://github.com/marketplace?type=actions) 和 [awesome-actions](https://link.juejin.cn/?target=https://github.com/sdras/awesome-actions)，找到所需的 Actions:
 
+
+
 ## 一、giuthub pages
 
 ### 概述
@@ -87,15 +89,49 @@
 
 
 
-## 基础概念与术语
+## 三、基础概念与术语
 
-每一家 CICD 产品，都有各自的配置方式，但是总体上用法差不多。我们了解下 CICD 的基本术语
+> 持续集成由很多操作组成，比如拉取代码、执行测试用例、登录远程服务器，发布到第三方服务等等，GitHub 把这些操作就称为 actions。
 
-- `Runner`: 用来执行 CI/CD 的构建服务器
-- `workflow/pipeline`: CI/CD 的工作流。(在大部分 CI，如 Gitlab 中为 Pipeline，而 Github 中为 Workflow，但二者实际上还是略有不同)
-- `job`: 任务，比如构建，测试和部署。每个 `workflow`/`pipeline` 由多个 `job` 组成。、
+- workflow（工作流程）：持续集成一次运行的过程，就是一个 workflow。
+- job（任务）：一个 workflow 由一个或多个 jobs 构成，含义是一次持续集成的运行，可以完成多个任务。
+- step（步骤）：每个 job 由多个 step 构成，一步步完成。
+- action（动作）：每个 step 可以依次执行一个或多个命令（action）。
+- workflow 文件：GitHub Actions 的配置文件叫做 workflow 文件，存放在代码仓库的 .github/workflows 目录。
 
+```sh
+workflow 文件采用 YAML 格式，文件名可以任意取，但是后缀名统一为 .yml，比如 deploy.yml。一个库可以有多个 workflow 文件。GitHub 只要发现 .github/workflows 目录里面有 .yml 文件，就会自动运行该文件。
+```
 
+workflow 文件的配置字段非常多，这里列举一些基本字段。
+
+- name : name 字段是 workflow 的名称。如果省略该字段，默认为当前 workflow 的文件名。
+
+  ```sh
+  name: deploy for feature_dev
+  ```
+
+- on：on 字段指定触发 workflow 的条件，通常是 push、pull_request。指定触发事件时，可以限定分支或标签。
+
+  ```sh
+  on:
+    push:
+      branches:
+        - mian
+  ```
+
+  上面代码指定，只有 main 分支发生 push 事件时，才会触发 workflow。
+
+- jobs：jobs 字段，表示要执行的一项或多项任务。其中的 runs-on 字段指定运行所需要的虚拟机环境。
+
+  ```SH
+  runs-on: ubuntu-latest
+  ```
+
+- steps：steps 字段指定每个 job 的运行步骤，可以包含一个或多个步骤。每个步骤都可以指定以下三个字段。
+  - jobs.<job_id>.steps.name：步骤名称。
+  - jobs.<job_id>.steps.run：该步骤运行的命令或者 action。
+  - jobs.<job_id>.steps.env：该步骤所需的环境变量。
 
 
 
