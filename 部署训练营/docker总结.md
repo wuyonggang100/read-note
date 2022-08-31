@@ -8,13 +8,101 @@
 
 ### 1.3 仓库
 
-# 二、镜像仓库的使用
+# 二、docker 的使用
 
-# 三、镜像的使用
+2.1 安装和卸载
+
+```sh
+# 卸载旧版本
+yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-selinux \
+                  docker-engine-selinux \
+                  docker-engine \
+                  docker-ce
+# 安装yum工具
+sudo yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2 --skip-broken
+# 设置docker镜像源为阿里云
+yum-config-manager \
+    --add-repo \
+    https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+# 安装 docker 社区版，免费
+sudo yum install -y docker-ce docker-ce-cli containerd.io # 完整安装
+yum install -y docker-ce # 非完整安装
+# 启动docker
+systemctl start docker
+# 配置镜像加速
+sudo mkdir -p /etc/docker
+
+# 在文件夹内新建一个daemon.json文件
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://akchsmlh.mirror.aliyuncs.com"]
+}
+EOF
+
+# 重新加载文件
+sudo systemctl daemon-reload
+# 重启docker
+sudo systemctl restart docker
+```
+
+
+
+2.2 启动 
+
+```sh
+systemctl start docker
+```
+
+2.3 停止
+
+```sh
+systemctl stop docker
+```
+
+2.4 重启
+
+```sh
+systemctl restart docker
+```
+
+2.5 查看状态
+
+```sh
+systemctl status docker
+```
+
+2.6 开机启动
+
+```sh
+systemctl enable docker
+```
+
+2.7 查看版本信息，概要
+
+```sh
+docker version
+docker -v
+docker info
+```
+
+
+
+# 三、镜像仓库的使用
+
+# 四、镜像的使用
 
 3.1 镜像相关的命令
 
-# 四、容器的使用
+# 五、容器的使用
 
 ```sh
 https://www.dandelioncloud.cn/article/details/1458248553532579842
@@ -153,17 +241,17 @@ WARNING! This will remove:
   - all dangling build cache
 ```
 
-# 五、镜像与容器之间的关联关系
+# 六、镜像与容器之间的关联关系
 
-# 六、DockerFile
+# 七、DockerFile
 
 6.1 将脚本翻译为 dockerfile 文件
 
-# 七、docker-compose
+# 八、docker-compose
 
 完整配置解释见 [完整配置](https://deepzz.com/post/docker-compose-file.html#toc_31)
 
-# 八、docker network
+# 九、docker network
 
 详见 [简书](https://www.jianshu.com/p/3004fbce4d37?u_atoken=7e5eba42-1461-4424-b80d-0b3afc9110f7&u_asession=01VvzYaV_gHsrNjhLE1Su1GAfzk6LJv2mhgtQApNYZIFxL14G2rBZrQE7vxx7NDh_dX0KNBwm7Lovlpxjd_P_q4JsKWYrT3W_NKPr8w6oU7K8nD5cfoNoTK_6GA3wyon3mCvvWHyhA8I9G3hxoTho1LGBkFo3NEHBv0PZUm6pbxQU&u_asig=05qqfmDpV5jnzQ3zaOR-kKvo9GIyPSEU9bw8mlVlMVGppZ9pJxMONfYVqMxov9SKyxJiyccUUyR3518TpSIGyIwgwM6toykM2wPEZonwQg5YNHdY_SbRZxvoGKF3gNR6FYRi54SlC2WoHrOabV4aW_IeoqMN8dtl6KGO3T8OB_mdz9JS7q8ZD7Xtz2Ly-b0kmuyAKRFSVJkkdwVUnyHAIJzUrY0QhB-Ma-EqxeO6vNS5HipymZkD-PpMAPXZfii-1IChTz2MQxpCmDDGYlh3aZze3h9VXwMyh6PgyDIVSG1W9HRCuSkoPezGK-B_JV3Q83S0gA-YCVD9qXtlq4leRItDdgzKzNqrrWi9_-2TUYxFyUe5pNRJDtrRTZ4ViTRkgFmWspDxyAEEo4kbsryBKb9Q&u_aref=QNV%2BNasOaPsJ%2ByEz0C1U11jPt0o%3D)
 
@@ -247,7 +335,7 @@ WARNING! This will remove:
 
   
 
-# 九、traefik
+# 十、traefik
 
 Traefik 是一个云原生的新型的 HTTP 反向代理、负载均衡软件。
 
