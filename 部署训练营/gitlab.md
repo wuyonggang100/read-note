@@ -56,7 +56,7 @@ netstat -tunlp|grep 22
 ```sh
 port: 2222 # 原本为22
 
-sudo service ssh restart
+sudo service sshd restart
 ```
 
 docker-compose 中运行
