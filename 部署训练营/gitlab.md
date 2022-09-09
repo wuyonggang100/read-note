@@ -1,4 +1,4 @@
-docker 中直接安装运行
+# docker 中直接安装运行
 
 1、安装
 
@@ -18,7 +18,7 @@ $ docker search gitlab
 ```sh
 sudo docker run --detach \
   --hostname gitlab.example.com \
-  --publish 443:443 --publish 80:80 --publish 22:22 \
+  --publish 443:443 --publish 80:80 --publish 222:22 \
   --name gitlab \
   --restart always \
   --volume /srv/gitlab/config:/etc/gitlab \
@@ -27,14 +27,14 @@ sudo docker run --detach \
   gitlab/gitlab-ce:latest
 ```
 
-运行成功后会出现一行很长的字符串，查看 docker ps -a , 如果 gitlab 的容器状态为 up 说明在运行中了`STATUS` 为 `health: starting`，说明 gitlab 的服务正在启动中，还没有启动完毕。等这个状态变成 `healthy` 时则说明已经部署完成，可以访问了。
+运行成功后会出现一行很长的字符串是容器 id，查看 docker ps -a , 如果 gitlab 的容器状态为 up 说明在运行中了`STATUS` 为 `health: starting`，说明 gitlab 的服务正在启动中，还没有启动完毕。等这个状态变成 `healthy` 时则说明已经部署完成，可以访问了。
 
 注释：
 
 ```sh
 sudo docker run --detach \  # 后台运行
   --hostname gitlab.example.com \   # 设置主机名或域名
-  --publish 443:443 --publish 80:80 --publish 22:22 \ # 本地端口的映射
+  --publish 443:443 --publish 80:80 --publish 222:22 \ # 本地端口的映射
   --name gitlab \     # gitlab-ce 的镜像运行成为一个容器，这里是对容器的命名
   --restart always \  # 设置重启方式，always 代表一直开启，服务器开机后也会自动开启的
   --volume /srv/gitlab/config:/etc/gitlab \   # 将 gitlab 的配置文件目录映射到 /srv/gitlab/config 目录中
@@ -43,33 +43,74 @@ sudo docker run --detach \  # 后台运行
   gitlab/gitlab-ce:latest  # 需要运行的镜像
 ```
 
+注意： **宿主机的22 端口尽量只给 ssh 连接使用，gitlab 可以使用其他端口，如 222**
+
 报错解决：
 
 如果启动时报错， 22端口被占用，就是 被 ssh 连接占用了；gitlab容器需要用到22端口，不能与宿主机冲突，这里需要修改宿主机的sshd服务的监听端口
 
 ```sh
-netstat -tunlp|grep 22
+netstat -tunlp|grep 22 # 查看端口号数字包含了22 的端口占用情况,如 122,322,2222等
+lsof -i:8000 # 查看指定端口占用情况
+kill -9 pid # 杀死进程 pid
 ```
 
 在 /etc/[ssh](https://so.csdn.net/so/search?q=ssh&spm=1001.2101.3001.7020)/中的 sshd_config文件夹中修改，然后重启 ssh
 
 ```sh
 port: 2222 # 原本为22
-
 sudo service sshd restart
 ```
 
-docker-compose 中运行
+监看日志
+
+```sh
+docker logs -f gitlab # 跟踪监看指定容器的实时日志  follow
+```
+
+
+
+# docker-compose 方式运行
+
+创建 docker-compose.yaml 文件如下
+
+```yaml
+version: "3"
+services:
+  gitlab:
+    # 使用的镜像
+    image: gitlab/gitlab-ce:latest
+    # 宕机或断电服务中断后自动重启
+    restart: always 
+    # 自定义启动后的容器名
+    container_name: gitlab 
+    # 映射的端口
+    ports:
+      - 443:443
+      - 80:80
+      - 222:22
+    # 容器卷
+    volumes:
+      - /srv/gitlab/config:/etc/gitlab
+      - /srv/gitlab/data:/var/opt/gitlab
+      - /srv/gitlab/logs:/var/log/gitlab
+```
+
+运行 
+
+```sh
+docker-compose up -d --build gitlab
+```
+
+运行需要稍等几分钟，如果出现 502 说明内存不够，虚拟机加大内存到 4G 再重启就可以了；
+
+
 
 
 
 https://zhuanlan.zhihu.com/p/63786567
 
-
-
 https://blog.csdn.net/BThinker/article/details/124097795
-
-
 
 https://www.jb51.net/article/152570.htm
 
