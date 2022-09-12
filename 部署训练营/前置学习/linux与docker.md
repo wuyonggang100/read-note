@@ -67,7 +67,29 @@ lsof -i:8888 # 查看占用 8888端口进程的具体信息
 kill -9 35734  # 杀死 pid 为35734 的进程
 ```
 
+### 查看已启动的服务
 
+```
+systemctl list-units --type=service
+```
+
+### 查看是否设置开机启动
+
+```
+systemctl list-unit-files | grep enable
+```
+
+### 设置开机启动
+
+```
+systemctl enable docker.service
+```
+
+### 关闭开机启动
+
+```
+systemctl disable docker.service
+```
 
 
 
