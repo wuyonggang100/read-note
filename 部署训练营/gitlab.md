@@ -104,6 +104,35 @@ docker-compose up -d --build gitlab
 
 运行需要稍等几分钟，如果出现 502 说明内存不够，虚拟机加大内存到 4G 再重启就可以了；
 
+# 修改root 账号默认密码
+
+查看 root 账号密码
+
+```sh
+docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password
+```
+
+第一次登录时需要修改root账号的密码，然后要重启 gitlab 容器，一定要重启；
+
+```sh
+# 先进入 gitlab 容器
+docker exec -it gitlab bash
+# 进入到gitlab命令行，需要等待片刻，出现 irb(main):001:0> 才算进入交互模式，
+gitlab-rails console
+# gitlab-rails console -e production
+
+# 获取用户，第一个用户是 root 
+user = User.where(id:1).first
+# user = User.where(username: 'root').first
+
+# 必须同时更改密码和password_confirmation才能使其正常工作，别忘了保存更改
+user.password = 'caz408727'
+user.password_confirmation = 'caz408727'
+# 出现 true 表示修改成功
+user.save!
+Administrator
+```
+
 
 
 
