@@ -1,4 +1,4 @@
-# docker 中直接安装运行
+# docker 中直接安装运行gitlab
 
 1、安装
 
@@ -70,7 +70,7 @@ docker logs -f gitlab # 跟踪监看指定容器的实时日志  follow
 
 
 
-# docker-compose 方式运行
+# docker-compose 方式运行gitlab
 
 创建 docker-compose.yaml 文件如下
 
@@ -135,6 +135,91 @@ Administrator
 
 
 
+## 安装和注册 gitlab-runner
+
+### 安装gitlab-runner，两种方式
+
+- 方式1
+
+```sh
+sudo docker run -d --name gitlab-runner --restart always \
+  -v /srv/gitlab-runner/config:/etc/gitlab-runner \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  gitlab/gitlab-runner:latest
+```
+
+- 方式2 
+
+  > docker-compose 
+
+  ```sh
+  version: "3"
+  services:
+    gitlab-runner:
+      image: gitlab/gitlab-runner:latest
+      restart: always 
+      depends_on:
+        - gitlab
+      container_name: gitlab-runner
+      # 开启授权访问
+      privileged: true
+      # 容器卷
+      volumes:
+        - /srv/gitlab-runner/config:/etc/gitlab-runner
+        - /var/run/docker.sock:/var/run/docker.sock
+  ```
+
+  
+
+### 注册gitlab runner 
+
+> token 需要到运行起来的 gitlab 页面头部菜单找到 扳手图标--> Runners --> Register an instance runner --> 复制要一个 token 过来；然后填到如下参数中
+
+注册成功后可以看到复制token的页面下方，会出现一个 gitlab-runner 实例
+
+- 方式1
+
+  ```sh
+   docker run --rm -v /srv/gitlab-runner/config:/etc/gitlab-runner gitlab/gitlab-runner register \ 
+    --non-interactive \
+    --executor "docker" \
+    --docker-image alpine:latest \
+    --url "http://gitlab.mczaiyun.top/" \
+    --registration-token "vtizNrFzQKFacsSMxsJX" \
+    --description "first-register-runner" \
+    --tag-list "test-cicd1,dockercicd1" \
+    --run-untagged="true" \
+    --locked="false" \
+    --access-level="not_protected"
+  ```
+
+- 方式2
+
+  > 容器名为 gitlab-runner
+
+  ```sh
+  # 进入 gitlab-runner 容器中
+  docker exec -it gitlab-runner bansh
+  # 注册，url 可以是域名或 ip，token 是上面复制的 ip
+  gitlab-runner register \
+    --non-interactive \
+    --executor "docker" \
+    --docker-image alpine:latest \
+    --url "http://192.168.201.129/" \
+    --registration-token "i4LJ1qrrPd9M44Xg6qUB" \
+    --description "first-register-runner" \
+    --tag-list "test-cicd1,dockercicd1" \
+    --run-untagged="true" \
+    --locked="false" \
+    --access-level="not_protected" 
+  ```
+
+- 方式3 
+
+  > 使用命令行交互的方式
+
+
+
 
 
 https://zhuanlan.zhihu.com/p/63786567
@@ -146,6 +231,8 @@ https://www.jb51.net/article/152570.htm
 https://zhuanlan.zhihu.com/p/328795102
 
 https://blog.csdn.net/u012922706/article/details/80252700
+
+
 
 
 
