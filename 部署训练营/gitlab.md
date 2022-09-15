@@ -216,7 +216,84 @@ sudo docker run -d --name gitlab-runner --restart always \
 
 - 方式3 
 
-  > 使用命令行交互的方式
+  > 使用命令行交互一问一答的方式
+
+
+
+gitlab-runner ci 文件
+
+
+
+# 安装启动 jenkins 
+
+docker-compose 方式，运行 docker-compose up -d --build jenkins 
+
+```sh
+  jenkins:
+    # image: jenkins/jenkins:lts
+    # 中国定制版，镜像大小 650 多M
+    image: jenkinszh/jenkins-zh
+    restart: always 
+    ports:
+      - 8081:8080
+      - 50000:50000
+    container_name: jinkens
+
+    # jenkins的时间还是跟系统时间错了8小时, 修正一下
+    environment:
+       TIME_ZONE: -Duser.timezone=Asia/Shanghai
+    
+    # 开启授权访问
+    privileged: true
+    # 容器卷
+    volumes:
+      - /opt/jenkins/home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+
+    user: root
+    networks:
+      - gitlab
+```
+
+## 登录并获取密码
+
+启动后登录 8081 端口，可以看到页面需要粘贴密码，到容器内查看密码
+
+```sh
+docker exec -it jenkins bash
+cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+或者到宿主机的容器卷目录查看，与上面结果一样
+
+```sh
+cat /opt/jenkins/home/secrets/initialAdminPassword
+```
+
+或者从日志中获取
+
+```sh
+docker logs jenkins
+```
+
+显示实例离线的解决
+
+> 因为墙了，无法访问到默认的插件源，需要更换插件源。
+
+新开一个浏览器 tab，打开 ip:8081/pluginManager/advanced   然后找到最下面的 Update Site，填写清华插件源，然后点击一下 check now 按钮， 如果有红色报错提示，先不管，再重启  jenkins  容器，再次访问就OK了； 
+
+```sh
+将 https://updates.jenkins-zh.cn/update-center.json  
+替换为 
+https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
+```
+
+需要注意的是，看看宿主卷  jenkins 工作 目录下的  hudson.model.UpdateCenter.xml 地址是否已经同步修改过来，如果没有就要用 vi 命令修改一下；
+
+如果出现 无法连接到 jenkins , 多点击几次   重试   按钮，可以解决；
+
+
 
 
 
