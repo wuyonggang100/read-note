@@ -173,6 +173,8 @@ sudo docker run -d --name gitlab-runner --restart always \
 
 ### 注册gitlab runner 
 
+> 将 gitlab 注册到 gitlab-runner ，然后二者就可以关联起来，进行 CICD 了
+>
 > token 需要到运行起来的 gitlab 页面头部菜单找到 扳手图标--> Runners --> Register an instance runner --> 复制要一个 token 过来；然后填到如下参数中
 
 注册成功后可以看到复制token的页面下方，会出现一个 gitlab-runner 实例
@@ -185,7 +187,7 @@ sudo docker run -d --name gitlab-runner --restart always \
     --executor "docker" \
     --docker-image alpine:latest \
     --url "http://gitlab.mczaiyun.top/" \
-    --registration-token "vtizNrFzQKFacsSMxsJX" \
+    --registration-token "ViuyzoYGqA5m6hRWc5f2" \
     --description "first-register-runner" \
     --tag-list "test-cicd1,dockercicd1" \
     --run-untagged="true" \
@@ -199,14 +201,14 @@ sudo docker run -d --name gitlab-runner --restart always \
 
   ```sh
   # 进入 gitlab-runner 容器中
-  docker exec -it gitlab-runner bansh
+  docker exec -it gitlab-runner bash
   # 注册，url 可以是域名或 ip，token 是上面复制的 ip
   gitlab-runner register \
     --non-interactive \
     --executor "docker" \
     --docker-image alpine:latest \
-    --url "http://192.168.201.129/" \
-    --registration-token "i4LJ1qrrPd9M44Xg6qUB" \
+    --url "http://192.168.158.140/" \
+    --registration-token "ViuyzoYGqA5m6hRWc5f2" \
     --description "first-register-runner" \
     --tag-list "test-cicd1,dockercicd1" \
     --run-untagged="true" \
@@ -295,7 +297,7 @@ https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 
 
 
-
+创建分组和项目，项目地址如果是短域名方式需要配置 hosts 来对应域名，然后CMD 中执行 ipconfig /flushdns 来刷新 dns 即可；或者使用
 
 
 
