@@ -291,9 +291,11 @@ docker logs jenkins
 https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 ```
 
-需要注意的是，看看宿主卷  jenkins 工作 目录下的  hudson.model.UpdateCenter.xml 地址是否已经同步修改过来，如果没有就要用 vi 命令修改一下；
+需要注意的是，看看宿主卷  jenkins 工作 目录下的  hudson.model.UpdateCenter.xml 地址是否已经同步修改过来，如果没有就要用 vi 命令修改一下；找到宿主机下 jenkins/home 目录的 updates/default.json ，用 vim 将 第一行的 google 改为 baidu 或其他能访问的网址，重启 jenkins ；
 
 如果出现 无法连接到 jenkins , 多点击几次   重试   按钮，可以解决；
+
+
 
 
 
