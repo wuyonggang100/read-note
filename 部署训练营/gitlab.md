@@ -318,6 +318,27 @@ https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 
 4. 如果出现 无法连接到 jenkins , 多点击几次   重试   按钮，可以解决；
 
+## jenkins 升级
+
+jenkins 版本过低时很多插件无法安装，因此需要升级，升级方法很简单，就是关闭 jenkins 服务后，到 jenkins 官网下载高版本 war 包，进入宿主机容器卷替换原来的 war 包， 然后重启；
+
+```sh
+https://www.jenkins.io/  # 选择 jar 
+```
+
+下载到本地，上传到宿主目录，进入 jenkins 容器，将war包移动到别的目录下，然后从宿主机复制新 war 包到容器内
+
+> 从宿主机复制文件到容器内：docker cp 宿主机文件路径 目标容器名: 目标容器内的存放目录
+
+```sh
+docker exec -it jenkins bash
+cd /usr/lib/jenkins
+mv jenkins.war /root/jenkin # 移动到别的目录
+docker cp /opt/jenkins/jenkins.war jinkens:/usr/share/jenkins # 复制 war包到容器内
+```
+
+地址栏输入  ip:port/restart 重启 jenkins 服务
+
 
 
 创建账号
