@@ -279,6 +279,8 @@ cat /opt/jenkins/home/secrets/initialAdminPassword
 docker logs jenkins
 ```
 
+### 安装插件
+
 显示实例离线的解决
 
 > 因为墙了，无法访问到默认的插件源，需要更换插件源。
@@ -291,9 +293,38 @@ docker logs jenkins
 https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json
 ```
 
-需要注意的是，看看宿主卷  jenkins 工作 目录下的  hudson.model.UpdateCenter.xml 地址是否已经同步修改过来，如果没有就要用 vi 命令修改一下；找到宿主机下 jenkins/home 目录的 updates/default.json ，用 vim 将 第一行的 google 改为 baidu 或其他能访问的网址，重启 jenkins ；
+1. 需要注意的是，看看宿主卷  jenkins 工作 目录下的  hudson.model.UpdateCenter.xml 地址是否已经同步修改过来，如果没有就要用 vi 命令修改一下；
 
-如果出现 无法连接到 jenkins , 多点击几次   重试   按钮，可以解决；
+2. 不能连接到 Google 的解决办法，找到宿主机下 jenkins/home 目录的 updates/default.json ，用 vim 将 第一行的 google 改为 baidu 或其他能访问的网址，或者修改 hosts 文件，然后让 jenkins 能访问网络；编辑`host`文件，linux系统下都是统一在`/etc/host`
+
+   > 用google来判断网络状态，Jenkins就会发现可以ping通google的网址，就会认为有网了
+
+   ```bash
+   vim /etc/host
+   ```
+
+   在文件最后添加以下内容
+
+   ```
+   127.0.0.1    www.google.com
+   ```
+
+3. 按照如下方式重启 jenkins ，
+
+   ```sh
+   地址栏输入  http://192.168.201.129:8081/restart 
+   或者进入jenkins容器用命令  sudo service jenkins restart   
+   ```
+
+4. 如果出现 无法连接到 jenkins , 多点击几次   重试   按钮，可以解决；
+
+
+
+创建账号
+
+root   --- caz408727
+
+
 
 
 
